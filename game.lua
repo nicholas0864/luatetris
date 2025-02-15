@@ -4,6 +4,8 @@ local Utils = require("utils")
 local Game = {}
 Game.__index = Game
 
+-- Creates a new Game instance.
+-- @return A new Game instance.
 function Game:new()
     local instance = {
         board = self:initializeBoard(),
@@ -16,6 +18,8 @@ function Game:new()
     return instance
 end
 
+-- Initializes the game board.
+-- @return A 2D array representing the game board.
 function Game:initializeBoard()
     local board = {}
     for row = 1, 20 do
@@ -27,10 +31,12 @@ function Game:initializeBoard()
     return board
 end
 
+-- Starts the game by spawning the first piece.
 function Game:start()
     self:spawnPiece()
 end
 
+-- Spawns a new piece at the top of the board.
 function Game:spawnPiece()
     local pieceTypes = {"I", "J", "L", "O", "S", "T", "Z"}
     local pieceType = pieceTypes[Utils.random(1, #pieceTypes)]
@@ -42,6 +48,8 @@ function Game:spawnPiece()
     end
 end
 
+-- Updates the game state.
+-- @param dt The time elapsed since the last update.
 function Game:update(dt)
     if not self.isGameOver then
         self.dropTimer = self.dropTimer + dt
@@ -52,6 +60,7 @@ function Game:update(dt)
     end
 end
 
+-- Moves the current piece down by one unit.
 function Game:movePieceDown()
     self.currentPiece.y = self.currentPiece.y + 1
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -62,6 +71,7 @@ function Game:movePieceDown()
     end
 end
 
+-- Moves the current piece left by one unit.
 function Game:movePieceLeft()
     self.currentPiece.x = self.currentPiece.x - 1
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -69,6 +79,7 @@ function Game:movePieceLeft()
     end
 end
 
+-- Moves the current piece right by one unit.
 function Game:movePieceRight()
     self.currentPiece.x = self.currentPiece.x + 1
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -76,6 +87,7 @@ function Game:movePieceRight()
     end
 end
 
+-- Rotates the current piece 90 degrees clockwise.
 function Game:rotatePiece()
     Utils.rotatePiece(self.currentPiece)
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -85,6 +97,7 @@ function Game:rotatePiece()
     end
 end
 
+-- Locks the current piece in place on the board.
 function Game:lockPiece()
     for y = 1, #self.currentPiece.shape do
         for x = 1, #self.currentPiece.shape[y] do
@@ -97,6 +110,7 @@ function Game:lockPiece()
     end
 end
 
+-- Clears any full lines from the board.
 function Game:clearLines()
     for y = #self.board, 1, -1 do
         local isFullLine = true
@@ -113,6 +127,7 @@ function Game:clearLines()
     end
 end
 
+-- Draws the game board and the current piece.
 function Game:draw()
     for y = 1, #self.board do
         for x = 1, #self.board[y] do
@@ -135,6 +150,8 @@ function Game:draw()
     love.graphics.setColor(1, 1, 1)  -- Reset color to white
 end
 
+-- Handles key presses to control the game.
+-- @param key The key that was pressed.
 function Game:keypressed(key)
     if key == "left" then
         self:movePieceLeft()
