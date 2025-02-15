@@ -13,10 +13,12 @@ function Game:new()
         isGameOver = false,
         dropTimer = 0,
         dropInterval = 0.5,
+        score = 0,  -- Add score field
     }
     setmetatable(instance, Game)
     return instance
 end
+
 
 -- Initializes the game board.
 -- @return A 2D array representing the game board.
@@ -114,6 +116,7 @@ end
 
 -- Clears any full lines from the board.
 function Game:clearLines()
+    local linesCleared = 0
     for y = #self.board, 1, -1 do
         local isFullLine = true
         for x = 1, #self.board[y] do
@@ -123,6 +126,7 @@ function Game:clearLines()
             end
         end
         if isFullLine then
+            linesCleared = linesCleared + 1
             table.remove(self.board, y)
             local newRow = {}
             for i = 1, 10 do
@@ -131,23 +135,43 @@ function Game:clearLines()
             table.insert(self.board, 1, newRow)
         end
     end
+
+    -- Update the score based on the number of lines cleared
+    if linesCleared > 0 then
+        self.score = self.score + (linesCleared * 100)  -- Example: 100 points per line cleared
+    end
 end
 
 
+
 function Game:draw()
+    -- Draw the locked pieces
     for y = 1, #self.board do
         for x = 1, #self.board[y] do
             local cell = self.board[y][x]
-            if type(cell) == "table" and cell[4] ~= 0 then  -- Check if it's a valid table
+            if type(cell) == "table" and cell[4] ~= 0 then
                 love.graphics.setColor(cell[1], cell[2], cell[3]) -- Use stored color
                 love.graphics.rectangle("fill", (x - 1) * 30, (y - 1) * 30, 30, 30)
             end
         end
     end
 
-    -- Draw the current falling piece
+    -- Get the ghost piece position
+    local ghostY = self:getGhostPiecePosition()
     local shape = self.currentPiece:getCurrentShape()
     local color = self.currentPiece:getColor()
+
+    -- Draw the ghost piece (semi-transparent)
+    love.graphics.setColor(color[1], color[2], color[3], 0.3) -- Make it transparent
+    for y = 1, #shape do
+        for x = 1, #shape[y] do
+            if shape[y][x] ~= 0 then
+                love.graphics.rectangle("fill", (self.currentPiece.x + x - 2) * 30, (ghostY + y - 2) * 30, 30, 30)
+            end
+        end
+    end
+
+    -- Draw the current falling piece
     love.graphics.setColor(color)
     for y = 1, #shape do
         for x = 1, #shape[y] do
@@ -156,7 +180,33 @@ function Game:draw()
             end
         end
     end
+
+    -- Draw the score at the top of the screen
+    love.graphics.setColor(1, 1, 1)  -- White color for the score
+    love.graphics.setFont(love.graphics.newFont(24))  -- Set font size
+    love.graphics.print("Score: " .. self.score, 10, 10)  -- Display score at (10, 10)
+
     love.graphics.setColor(1, 1, 1) -- Reset color to white
+end
+
+
+
+
+function Game:getGhostPiecePosition()
+    local ghostPiece = self.currentPiece:clone()  -- Clone the current piece
+    local ghostY = ghostPiece.y
+
+    -- Move ghost piece down until it collides
+    while true do
+        ghostY = ghostY + 1
+        ghostPiece.y = ghostY
+        if Utils.checkCollision(self.board, ghostPiece) then
+            ghostY = ghostY - 1
+            break
+        end
+    end
+
+    return ghostY
 end
 
 

@@ -61,4 +61,20 @@ function Piece:rotate()
     self.shape = newShape
 end
 
+function Piece:clone()
+    local newPiece = Piece:new(self.type)
+    newPiece.x = self.x
+    newPiece.y = self.y
+    newPiece.shape = {}
+    for i = 1, #self.shape do
+        newPiece.shape[i] = {}
+        for j = 1, #self.shape[i] do
+            newPiece.shape[i][j] = self.shape[i][j]
+        end
+    end
+    return newPiece
+end
+
+
+
 return Piece
