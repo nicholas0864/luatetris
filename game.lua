@@ -25,11 +25,12 @@ function Game:initializeBoard()
     for row = 1, 20 do
         board[row] = {}
         for col = 1, 10 do
-            board[row][col] = 0
+            board[row][col] = {0, 0, 0, 0} -- Empty cell with transparency
         end
     end
     return board
 end
+
 
 -- Starts the game by spawning the first piece.
 function Game:start()
@@ -97,46 +98,54 @@ function Game:rotatePiece()
     end
 end
 
--- Locks the current piece in place on the board.
 function Game:lockPiece()
+    local color = self.currentPiece:getColor() -- Get the piece's color
     for y = 1, #self.currentPiece.shape do
         for x = 1, #self.currentPiece.shape[y] do
             if self.currentPiece.shape[y][x] ~= 0 then
                 local boardX = self.currentPiece.x + x - 1
                 local boardY = self.currentPiece.y + y - 1
-                self.board[boardY][boardX] = self.currentPiece.shape[y][x]
+                self.board[boardY][boardX] = {color[1], color[2], color[3], 1} -- Store the color
             end
         end
     end
 end
+
 
 -- Clears any full lines from the board.
 function Game:clearLines()
     for y = #self.board, 1, -1 do
         local isFullLine = true
         for x = 1, #self.board[y] do
-            if self.board[y][x] == 0 then
+            if self.board[y][x][4] == 0 then -- Check alpha instead of number
                 isFullLine = false
                 break
             end
         end
         if isFullLine then
             table.remove(self.board, y)
-            table.insert(self.board, 1, {0, 0, 0, 0, 0, 0, 0, 0, 0, 0})
+            local newRow = {}
+            for i = 1, 10 do
+                newRow[i] = {0, 0, 0, 0} -- Ensure new row is formatted properly
+            end
+            table.insert(self.board, 1, newRow)
         end
     end
 end
 
--- Draws the game board and the current piece.
+
 function Game:draw()
     for y = 1, #self.board do
         for x = 1, #self.board[y] do
-            if self.board[y][x] ~= 0 then
-                love.graphics.setColor(0.5, 0.5, 0.5)  -- Grey for locked pieces
+            local cell = self.board[y][x]
+            if type(cell) == "table" and cell[4] ~= 0 then  -- Check if it's a valid table
+                love.graphics.setColor(cell[1], cell[2], cell[3]) -- Use stored color
                 love.graphics.rectangle("fill", (x - 1) * 30, (y - 1) * 30, 30, 30)
             end
         end
     end
+
+    -- Draw the current falling piece
     local shape = self.currentPiece:getCurrentShape()
     local color = self.currentPiece:getColor()
     love.graphics.setColor(color)
@@ -147,8 +156,10 @@ function Game:draw()
             end
         end
     end
-    love.graphics.setColor(1, 1, 1)  -- Reset color to white
+    love.graphics.setColor(1, 1, 1) -- Reset color to white
 end
+
+
 
 -- Handles key presses to control the game.
 -- @param key The key that was pressed.

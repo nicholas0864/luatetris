@@ -16,18 +16,19 @@ end
 -- @param piece The current piece, which contains its shape and position.
 -- @return True if there is a collision, false otherwise.
 function Utils.checkCollision(board, piece)
-    local shape = piece:getCurrentShape()
-    for y = 1, #shape do
-        for x = 1, #shape[y] do
-            if shape[y][x] ~= 0 then
+    for y = 1, #piece.shape do
+        for x = 1, #piece.shape[y] do
+            if piece.shape[y][x] ~= 0 then
                 local boardX = piece.x + x - 1
                 local boardY = piece.y + y - 1
+
                 -- Check if the piece is out of bounds
-                if boardY < 1 or boardY > #board or boardX < 1 or boardX > #board[1] then
+                if boardX < 1 or boardX > 10 or boardY > 20 then
                     return true
                 end
-                -- Check if the piece collides with existing blocks on the board
-                if boardY >= 1 and board[boardY][boardX] ~= 0 then
+
+                -- Check if the board cell is occupied (alpha > 0 means it's filled)
+                if boardY >= 1 and board[boardY][boardX][4] ~= 0 then
                     return true
                 end
             end
@@ -35,6 +36,7 @@ function Utils.checkCollision(board, piece)
     end
     return false
 end
+
 
 -- Rotates the given piece.
 -- @param piece The current piece to be rotated.
