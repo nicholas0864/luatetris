@@ -20,6 +20,7 @@ function Game:new()
 end
 
 
+
 -- Initializes the game board.
 -- @return A 2D array representing the game board.
 function Game:initializeBoard()
@@ -144,7 +145,22 @@ end
 
 
 
+
 function Game:draw()
+
+    -- Draw the grid background first
+    love.graphics.setColor(0.2, 0.2, 0.2)  -- Dark gray color for the grid lines
+    
+    -- Draw vertical lines
+    for x = 0, 10 do
+        love.graphics.line(x * 30, 0, x * 30, 600)  -- Draw a vertical line
+    end
+
+    -- Draw horizontal lines
+    for y = 0, 20 do
+        love.graphics.line(0, y * 30, 300, y * 30)  -- Draw a horizontal line
+    end
+
     -- Draw the locked pieces
     for y = 1, #self.board do
         for x = 1, #self.board[y] do
