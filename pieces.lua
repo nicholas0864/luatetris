@@ -1,12 +1,9 @@
--- Piece module
--- This module defines the Piece class, which represents the Tetris pieces.
+
 
 local Piece = {}
 Piece.__index = Piece
 
--- Creates a new Piece instance.
 -- @param type The type of the piece (one of "I", "J", "L", "O", "S", "T", "Z").
--- @return A new Piece instance.
 function Piece:new(type)
     local shapes = {
         I = {{1, 1, 1, 1}},

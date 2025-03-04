@@ -4,8 +4,7 @@ local Utils = require("utils")
 local Game = {}
 Game.__index = Game
 
--- Creates a new Game instance.
--- @return A new Game instance.
+
 function Game:new()
     local instance = {
         board = self:initializeBoard(),
@@ -21,8 +20,7 @@ end
 
 
 
--- Initializes the game board.
--- @return A 2D array representing the game board.
+
 function Game:initializeBoard()
     local board = {}
     for row = 1, 20 do
@@ -35,12 +33,10 @@ function Game:initializeBoard()
 end
 
 
--- Starts the game by spawning the first piece.
 function Game:start()
     self:spawnPiece()
 end
 
--- Spawns a new piece at the top of the board.
 function Game:spawnPiece()
     local pieceTypes = {"I", "J", "L", "O", "S", "T", "Z"}
     local pieceType = pieceTypes[Utils.random(1, #pieceTypes)]
@@ -52,8 +48,7 @@ function Game:spawnPiece()
     end
 end
 
--- Updates the game state.
--- @param dt The time elapsed since the last update.
+
 function Game:update(dt)
     if not self.isGameOver then
         self.dropTimer = self.dropTimer + dt
@@ -64,7 +59,6 @@ function Game:update(dt)
     end
 end
 
--- Moves the current piece down by one unit.
 function Game:movePieceDown()
     self.currentPiece.y = self.currentPiece.y + 1
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -75,7 +69,6 @@ function Game:movePieceDown()
     end
 end
 
--- Moves the current piece left by one unit.
 function Game:movePieceLeft()
     self.currentPiece.x = self.currentPiece.x - 1
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -83,7 +76,6 @@ function Game:movePieceLeft()
     end
 end
 
--- Moves the current piece right by one unit.
 function Game:movePieceRight()
     self.currentPiece.x = self.currentPiece.x + 1
     if Utils.checkCollision(self.board, self.currentPiece) then
@@ -121,7 +113,7 @@ function Game:clearLines()
     for y = #self.board, 1, -1 do
         local isFullLine = true
         for x = 1, #self.board[y] do
-            if self.board[y][x][4] == 0 then -- Check alpha instead of number
+            if self.board[y][x][4] == 0 then 
                 isFullLine = false
                 break
             end
@@ -131,15 +123,14 @@ function Game:clearLines()
             table.remove(self.board, y)
             local newRow = {}
             for i = 1, 10 do
-                newRow[i] = {0, 0, 0, 0} -- Ensure new row is formatted properly
+                newRow[i] = {0, 0, 0, 0} 
             end
             table.insert(self.board, 1, newRow)
         end
     end
 
-    -- Update the score based on the number of lines cleared
     if linesCleared > 0 then
-        self.score = self.score + (linesCleared * 100)  -- Example: 100 points per line cleared
+        self.score = self.score + (linesCleared * 100)  
     end
 end
 
